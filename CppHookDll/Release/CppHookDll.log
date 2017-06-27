@@ -1,0 +1,21 @@
+﻿  HookDll.cpp
+HookDll.cpp(165): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  C:\Program Files (x86)\Windows Kits\10\Include\10.0.15063.0\ucrt\stdio.h(1772): note: see declaration of 'sprintf'
+HookDll.cpp(173): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  C:\Program Files (x86)\Windows Kits\10\Include\10.0.15063.0\ucrt\stdio.h(1772): note: see declaration of 'sprintf'
+HookDll.cpp(309): warning C4129: 'M': unrecognized character escape sequence
+HookDll.cpp(347): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  C:\Program Files (x86)\Windows Kits\10\Include\10.0.15063.0\ucrt\stdio.h(1772): note: see declaration of 'sprintf'
+HookDll.cpp(362): warning C4996: 'wcstombs': This function or variable may be unsafe. Consider using wcstombs_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  C:\Program Files (x86)\Windows Kits\10\Include\10.0.15063.0\ucrt\stdlib.h(1019): note: see declaration of 'wcstombs'
+HookDll.cpp(331): warning C4101: 'ex': unreferenced local variable
+HookDll.cpp(416): warning C4101: 'ex': unreferenced local variable
+HookDll.cpp(458): warning C4129: 'M': unrecognized character escape sequence
+HookDll.cpp(475): warning C4101: 'ex': unreferenced local variable
+     Creating library C:\Users\ryan\Desktop\projects\windowControl\Release\CppHookDll.lib and object C:\Users\ryan\Desktop\projects\windowControl\Release\CppHookDll.exp
+  Generating code
+c:\users\ryan\desktop\projects\windowcontrol\cpphookdll\hookdll.cpp(138): warning C4715: 'getUUID': not all control paths return a value
+  All 2291 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
+  Finished generating code
+  CppHookDll.vcxproj -> C:\Users\ryan\Desktop\projects\windowControl\Release\CppHookDll.dll
+  CppHookDll.vcxproj -> C:\Users\ryan\Desktop\projects\windowControl\Release\CppHookDll.pdb (Full PDB)
