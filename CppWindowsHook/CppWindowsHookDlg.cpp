@@ -31,6 +31,8 @@
 #include <boost/interprocess/sync/scoped_lock.hpp>
 #include <boost/interprocess/sync/interprocess_semaphore.hpp>
 #include <boost/interprocess/sync/named_semaphore.hpp>
+#include <boost/function.hpp>
+
 #include <psapi.h>
 #pragma comment( lib, "psapi.lib" )
 #include <Rpcdce.h>
@@ -40,6 +42,9 @@
 
 #include <comutil.h>
 #pragma comment( lib, "comsuppwd.lib" )
+
+#include <windows.h>
+#pragma comment( lib, "User32.lib" )
 
 #include <sddl.h>
 #pragma comment( lib, "Advapi32.lib" )
@@ -131,7 +136,7 @@ CCppWindowsHookDlg::CCppWindowsHookDlg(CWnd* pParent /*=NULL*/)
 BEGIN_MESSAGE_MAP(CCppWindowsHookDlg, CDialog)
 	ON_MESSAGE(WM_KEYSTROKE, OnHookKeyboard)
 	ON_MESSAGE(WM_KEYINPUT, OnHookLowKeyboard)
-	ON_MESSAGE(WM_MOVESTART, OnMoveStart)
+	//ON_MESSAGE(WM_MOVESTART, OnMoveStart)
 	ON_MESSAGE(WM_MOVEEND, OnMoveEnd)
 	ON_MESSAGE(WM_MOVEUPDATE, OnMoveRequest)
 	ON_MESSAGE(WM_TEST, OnTest)
@@ -150,6 +155,21 @@ END_MESSAGE_MAP()
 
 
 
+void sendSocketMessage(std::string message) {
+
+
+	auto send_stream = make_shared<WsServer::SendStream>();
+	*send_stream << message;
+	if (!socketConnection) return;
+	server.send(socketConnection, send_stream, [](const boost::system::error_code& ec) {
+		if (ec) {
+			cout << "Server: Error sending message. " <<
+				//See http://www.boost.org/doc/libs/1_55_0/doc/html/boost_asio/reference.html, Error Codes for error code meanings
+				"Error: " << ec << ", error message: " << ec.message() << endl;
+		}
+	});
+	send_stream.reset();
+}
 
 
 BOOL CALLBACK updateActiveWindows(HWND hWnd, LPARAM lParam) {
@@ -170,11 +190,14 @@ BOOL CALLBACK updateActiveWindows(HWND hWnd, LPARAM lParam) {
 	std::string data = wnd_title;
 	int length = GetWindowTextLength(hWnd);
 	if (length == 0 ) return true;
-	//if (!IsWindowVisible(hWnd)) return true; ///
+	if (!IsWindowVisible(hWnd)) return true; ///
+	//OutputDebugString(L"\n name: ");
+	//OutputDebugStringA(data.c_str());
+	//OutputDebugString(L"\n ");
 	WindowHandles h = WindowHandles();
 	h.mainHandle = handleString;
 	h.parentHandle = parentString;
-	h.name = wnd_title;
+	h.name = data;
 	h.handle = hWnd;
 	h.parentHWND = hParent;
 	h.l = length;
@@ -259,59 +282,21 @@ PSECURITY_DESCRIPTOR MakeAllowAllSecurityDescriptor(void) // Read that you can g
 }
 
 HANDLE mMutex;
-BOOL CCppWindowsHookDlg::OnInitDialog()
-{
-	CDialog::OnInitDialog();
-	
-	//PSECURITY_DESCRIPTOR pSecDec = MakeAllowAllSecurityDescriptor();
-	//SECURITY_ATTRIBUTES secAttr;
-	//secAttr.nLength = sizeof(SECURITY_ATTRIBUTES);
-	//secAttr.lpSecurityDescriptor = pSecDec;
-	//secAttr.bInheritHandle = FALSE;
-	//&secAttr
-	 mMutex = ::CreateMutex(NULL, TRUE, L"Global\MUTEX");
-	 ReleaseMutex(mMutex);
-	//Set hook for detecting when windows come online
-	SetWinEventHook(EVENT_OBJECT_CREATE, EVENT_OBJECT_DESTROY, NULL, listenForWindows, 0, 0, WINEVENT_OUTOFCONTEXT);
-	globalHandle = m_hWnd;
-	SetLowKeyboardHook(true,0,m_hWnd);
-	//updateActiveWindows()
-	init = true;
-	EnumWindows(updateActiveWindows, NULL);
-	//std::map< std::string, WindowHandles> aw = activeWindows;//delete this
-	std::thread server_thread([this]() {
-		setupServer();
-	});
-	server_thread.detach();
-	
-	shared_memory_object::remove("RMoveRequest");
-	shared_memory_object::remove("UpdateMove");
-	shared_memory_object::remove("enableHooks");
-	shared_memory_object::remove("StartMove");
-	managed_shared_memory managed_shm{ open_or_create, "UpdateMove",999 };
-	managed_shared_memory shm(open_or_create, "RMoveRequest", 1024);
-	managed_shared_memory managed_shm2{ open_or_create, "enableHooks",999 };
+HANDLE testEvent;
+HANDLE waitHandle;
 
-	 if (!SetMouseHook(TRUE, 0, globalHandle))
-		{
-			AfxMessageBox(L"Fail to Install Hook!");
-			
-	}
-	//LocalFree(mMutex);
-
-	// Set the icon for this dialog.  The framework does this automatically
-	// when the application's main window is not a dialog
-	SetIcon(m_hIcon, TRUE);			// Set big icon
-	SetIcon(m_hIcon, FALSE);		// Set small icon
+map<std::string, boost::function<void()> > funcs;
+void testEventwait() {
+	OutputDebugString(L"event fired");
+	funcs["start"]();
+	//CCppWindowsHookDlg::OnMoveStart();
+};
 
 
-
-	return TRUE;
-}
 void CCppWindowsHookDlg::OnWindowPosChanging(WINDOWPOS FAR* lpwndpos) {
 
 	if (!m_visible) {
-		lpwndpos->flags &= ~SWP_SHOWWINDOW;
+		//lpwndpos->flags &= ~SWP_SHOWWINDOW;
 	}
 	CDialog::OnWindowPosChanging(lpwndpos);
 }
@@ -445,21 +430,6 @@ BOOL CALLBACK enumWindowsProc( HWND hWnd,LPARAM lParam) {
 	return TRUE;
 }
 
-void CCppWindowsHookDlg::sendSocketMessage(std::string message) {
-
-	
-	auto send_stream = make_shared<WsServer::SendStream>();
-	*send_stream << message;
-	if (!socketConnection) return;
-	server.send(socketConnection, send_stream, [](const boost::system::error_code& ec) {
-		if (ec) {
-			cout << "Server: Error sending message. " <<
-				//See http://www.boost.org/doc/libs/1_55_0/doc/html/boost_asio/reference.html, Error Codes for error code meanings
-				"Error: " << ec << ", error message: " << ec.message() << endl;
-		}
-	});
-	send_stream.reset();
-}
 
 
 
@@ -485,7 +455,7 @@ BOOL CALLBACK FindWindowByProcess(HWND hwnd, LPARAM lParam)
 
 long CCppWindowsHookDlg::OnTest(WPARAM wParam, LPARAM lParam)
 {
-	OutputDebugStringA("sent here");
+	OutputDebugStringA("skype here");
 	return 0;
 }
 
@@ -502,14 +472,105 @@ WindowHandles getWindow(std::string handleString,std::string parentString)
 		return hiddenWindows[parentString];
 	return WindowHandles();
 }
+void parseMoveEvents()
+{
 
-long CCppWindowsHookDlg::OnMoveStart(WPARAM wParam, LPARAM lParam)
+	std::thread LoopThread([=]()
+	{
+
+		bool parsing = true;
+
+
+
+		//boost::interprocess::named_semaphore semaphore(boost::interprocess::open_only_t(), "moveSem");
+		while (parsing) {
+			CString str;
+			if (!shouldParseEvents) {
+				parsing = false; //this lets us parse the last event passed
+			}
+
+
+			typedef boost::interprocess::allocator<char, boost::interprocess::managed_shared_memory::segment_manager> CharAllocator;
+			typedef boost::interprocess::basic_string<char, std::char_traits<char>, CharAllocator> my_string;
+			my_string *s;
+			std::string json;
+
+
+			try {
+				if (mMutex == NULL) {
+					mMutex = ::OpenMutex(SYNCHRONIZE, FALSE, L"Global\MUTEX");
+				}
+				DWORD dwait = ::WaitForSingleObject(mMutex, INFINITE);
+
+				//semaphore.wait();
+
+				managed_shared_memory managed_shm{ open_only, "UpdateMove" };
+
+				s = managed_shm.find_or_construct<my_string>("UpdateObject")("Hello!", managed_shm.get_segment_manager());
+				std::string st(s->data(), s->size());
+				json = st;
+				if (json == "Hello!") {
+					ReleaseMutex(mMutex);
+					//semaphore.post();
+					std::this_thread::sleep_for(
+						std::chrono::milliseconds(MOVEINTERVAL));
+					continue;
+				}
+				str = st.c_str();
+				//OutputDebugStringA("statmove\n");
+				//	OutputDebugStringA(json.c_str());
+				managed_shm.destroy<my_string>("UpdateObject");
+				ReleaseMutex(mMutex);
+				//semaphore.post();
+			}
+			catch (interprocess_exception const& ipe)
+			{
+				std::cerr << "Error: #" << ipe.get_error_code() << ", " << ipe.what() << "\n";
+			}
+			rapidjson::Document doc;
+			doc.Parse(json.c_str());
+			//OutputDebugStringA(json.c_str());
+
+			if (doc.Parse(json.c_str()).HasParseError()) {
+				auto err = doc.Parse(json.c_str()).GetParseError();
+				//cout << "Server: Sending message \"" << d.Parse(json).GetParseError() << "\" to " << (size_t)connection.get() << endl;
+				return;
+			}
+
+			POINT p;
+			if (GetCursorPos(&p)) {
+
+			}
+			rapidjson::Value mouseX(std::to_string(p.x).c_str(), doc.GetAllocator());
+			rapidjson::Value mouseY(std::to_string(p.y).c_str(), doc.GetAllocator());
+			doc.AddMember("x", mouseX, doc.GetAllocator());
+			doc.AddMember("y", mouseY, doc.GetAllocator());
+
+
+			rapidjson::StringBuffer buffer;
+			rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
+			doc.Accept(writer);
+			std::string output = buffer.GetString();
+			sendSocketMessage(output);
+
+
+			std::this_thread::sleep_for(
+				std::chrono::milliseconds(MOVEINTERVAL));
+
+		}
+
+	});
+	LoopThread.detach();
+
+}
+
+void OnMoveStart()
 {
 	//movingWindow = (HWND)wParam;
 	//char wnd_title[256];
 	//GetWindowTextA(movingWindow, wnd_title, 256);
 	//std::string data = wnd_title;
-	LPMOUSEHOOKSTRUCT mhs = (LPMOUSEHOOKSTRUCT)lParam;
+	//LPMOUSEHOOKSTRUCT mhs = (LPMOUSEHOOKSTRUCT)lParam;
 
 
 
@@ -557,10 +618,10 @@ long CCppWindowsHookDlg::OnMoveStart(WPARAM wParam, LPARAM lParam)
 	rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
 	doc.Accept(writer);
 	OutputDebugStringA("\nstartmove UUID:");
-	if (len == 0) {
-		OutputDebugStringA(h.mainHandle.c_str());
+	//if (len == 0) {
+		OutputDebugStringA(buffer.GetString());
 		OutputDebugStringA("\n");
-	}
+	//}
 	sendSocketMessage(buffer.GetString());
 	//sendSocketMessage(json);
 
@@ -570,10 +631,10 @@ long CCppWindowsHookDlg::OnMoveStart(WPARAM wParam, LPARAM lParam)
 
 	CString strItem(L"Move started:" +str+ L"\r\n");
 	CString strEdit;
-	GetDlgItem(IDC_MSG)->GetWindowText(strEdit);
-	GetDlgItem(IDC_MSG)->SetWindowText(strItem + strEdit);
+	//GetDlgItem(IDC_MSG)->GetWindowText(strEdit);
+	//GetDlgItem(IDC_MSG)->SetWindowText(strItem + strEdit);
 
-	return true;
+	return;
 }
 
 
@@ -774,97 +835,6 @@ void CCppWindowsHookDlg::hideWindow(std::string windowString) {
 }
 
 
-void CCppWindowsHookDlg::parseMoveEvents()
-{
-		
-	std::thread LoopThread([=]()
-	{
-
-		bool parsing = true;
-		
-
-
-		//boost::interprocess::named_semaphore semaphore(boost::interprocess::open_only_t(), "moveSem");
-		while (parsing) {
-			CString str;
-			if (!shouldParseEvents) {
-				parsing = false; //this lets us parse the last event passed
-			}
-
-			
-			typedef boost::interprocess::allocator<char, boost::interprocess::managed_shared_memory::segment_manager> CharAllocator;
-			typedef boost::interprocess::basic_string<char, std::char_traits<char>, CharAllocator> my_string;
-			my_string *s;
-			std::string json;
-
-			
-			try {
-				if (mMutex == NULL) {
-					mMutex = ::OpenMutex(SYNCHRONIZE, FALSE, L"Global\MUTEX");
-				}
-				DWORD dwait = ::WaitForSingleObject(mMutex, INFINITE);
-
-				//semaphore.wait();
-			
-				managed_shared_memory managed_shm{ open_only, "UpdateMove" };
-				
-				s = managed_shm.find_or_construct<my_string>("UpdateObject")("Hello!", managed_shm.get_segment_manager());
-				std::string st(s->data(), s->size());
-				json = st;
-				if (json == "Hello!") {
-					ReleaseMutex(mMutex);
-					//semaphore.post();
-					std::this_thread::sleep_for(
-						std::chrono::milliseconds(MOVEINTERVAL));
-					continue;
-				}
-				str = st.c_str();
-				//OutputDebugStringA("statmove\n");
-			//	OutputDebugStringA(json.c_str());
-				managed_shm.destroy<my_string>("UpdateObject");
-				ReleaseMutex(mMutex);
-				//semaphore.post();
-			}
-			catch (interprocess_exception const& ipe)
-			{
-				std::cerr << "Error: #" << ipe.get_error_code() << ", " << ipe.what() << "\n";
-			}
-			rapidjson::Document doc;
-			doc.Parse(json.c_str());
-			//OutputDebugStringA(json.c_str());
-
-			if (doc.Parse(json.c_str()).HasParseError()) {
-				auto err = doc.Parse(json.c_str()).GetParseError();
-				//cout << "Server: Sending message \"" << d.Parse(json).GetParseError() << "\" to " << (size_t)connection.get() << endl;
-				return;
-			}
-
-			POINT p;
-			if (GetCursorPos(&p)) {
-				
-			}
-			rapidjson::Value mouseX(std::to_string(p.x).c_str(), doc.GetAllocator());
-			rapidjson::Value mouseY(std::to_string(p.y).c_str(), doc.GetAllocator());
-			doc.AddMember("x", mouseX, doc.GetAllocator());
-			doc.AddMember("y", mouseY, doc.GetAllocator());
-
-
-			rapidjson::StringBuffer buffer;
-			rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
-			doc.Accept(writer);
-			std::string output = buffer.GetString();
-			sendSocketMessage(output);
-
-			
-			std::this_thread::sleep_for(
-				std::chrono::milliseconds(MOVEINTERVAL));
-
-		}
-
-	});
-	LoopThread.detach();
-
-}
 
 
 
@@ -1091,6 +1061,65 @@ void CCppWindowsHookDlg::OnBnClickedResettext()
 	GetDlgItem(IDC_MSG)->SetWindowText(NULL);
 }
 
+BOOL CCppWindowsHookDlg::OnInitDialog()
+{
+	CDialog::OnInitDialog();
+	SetWindowTextW(L"FinSim");
+	testEvent = CreateEvent(NULL,        // no security
+		FALSE,       // manual-reset event
+		FALSE,      // not signaled
+		L"testEvent"); // event name
+	funcs["start"] = &OnMoveStart;
+	RegisterWaitForSingleObject(&waitHandle, testEvent, (WAITORTIMERCALLBACK)testEventwait, NULL, INFINITE, WT_EXECUTEDEFAULT);
+
+
+	//ChangeWindowMessageFilter(m_hWnd, WM_TEST)
+	ChangeWindowMessageFilter(WM_TEST, 1);
+	//PSECURITY_DESCRIPTOR pSecDec = MakeAllowAllSecurityDescriptor();
+	//SECURITY_ATTRIBUTES secAttr;
+	//secAttr.nLength = sizeof(SECURITY_ATTRIBUTES);
+	//secAttr.lpSecurityDescriptor = pSecDec;
+	//secAttr.bInheritHandle = FALSE;
+	//&secAttr
+	mMutex = ::CreateMutex(NULL, TRUE, L"Global\MUTEX");
+	ReleaseMutex(mMutex);
+	//Set hook for detecting when windows come online
+	SetWinEventHook(EVENT_OBJECT_CREATE, EVENT_OBJECT_DESTROY, NULL, listenForWindows, 0, 0, WINEVENT_OUTOFCONTEXT);
+	globalHandle = m_hWnd;
+	SetLowKeyboardHook(true, 0, m_hWnd);
+	//updateActiveWindows()
+	init = true;
+	EnumWindows(updateActiveWindows, NULL);
+	//std::map< std::string, WindowHandles> aw = activeWindows;//delete this
+	std::thread server_thread([this]() {
+		setupServer();
+	});
+	server_thread.detach();
+
+	shared_memory_object::remove("RMoveRequest");
+	shared_memory_object::remove("UpdateMove");
+	shared_memory_object::remove("enableHooks");
+	shared_memory_object::remove("StartMove");
+	managed_shared_memory managed_shm{ open_or_create, "UpdateMove",999 };
+	managed_shared_memory shm(open_or_create, "RMoveRequest", 1024);
+	managed_shared_memory managed_shm2{ open_or_create, "enableHooks",999 };
+
+	if (!SetMouseHook(TRUE, 0, globalHandle))
+	{
+		AfxMessageBox(L"Fail to Install Hook!");
+
+	}
+	//LocalFree(mMutex);
+
+	// Set the icon for this dialog.  The framework does this automatically
+	// when the application's main window is not a dialog
+	SetIcon(m_hIcon, TRUE);			// Set big icon
+	SetIcon(m_hIcon, FALSE);		// Set small icon
+
+
+
+	return TRUE;
+}
 void CCppWindowsHookDlg::setupServer()
 {
 	server.config.port = 8080;

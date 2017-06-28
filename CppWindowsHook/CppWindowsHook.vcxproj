@@ -54,8 +54,8 @@
     <OutDir>$(SolutionDir)$(Configuration)\</OutDir>
     <IntDir>$(Configuration)\</IntDir>
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>C:\Users\ryan\Desktop\delete\boost_1_64_0;C:\Users\ryan\Desktop\projects\windowControl\include;C:\Users\ryan\Desktop\projects\windowControl\Simple-WebSocket-Server;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Users\ryan\Desktop\delete\boost_1_64_0\stage\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>E:\nodeProjects\boost_1_64_0;..\include;..\Simple-WebSocket-Server;$(IncludePath)</IncludePath>
+    <LibraryPath>E:\nodeProjects\boost_1_64_0\stage\lib;C:\OpenSSL-Win32\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <Midl>

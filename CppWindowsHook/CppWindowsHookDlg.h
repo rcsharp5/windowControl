@@ -23,7 +23,6 @@ public:
 	long OnHookLowKeyboardUp(WPARAM wParam, LPARAM lParam);
 
 	long OnHookLowKeyboard(WPARAM wParam, LPARAM lParam);
-	afx_msg long OnMoveStart(WPARAM wParam, LPARAM lParam);
 	afx_msg long OnMoveEnd(WPARAM wParam, LPARAM lParam);
 	afx_msg long OnMoveRequest(WPARAM wParam, LPARAM lParam);
 	afx_msg long OnTest(WPARAM wParam, LPARAM lParam);
@@ -44,8 +43,7 @@ public:
 	afx_msg void OnBnClickedSethookinput();
 	afx_msg void OnBnClickedResettext();
 	void setupServer();
-	void sendSocketMessage(std::string message);
-	void parseMoveEvents();
+	
 	void showWindow(std::string windowString);
 	void hideWindow(std::string windowString);
 };

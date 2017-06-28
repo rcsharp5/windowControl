@@ -114,12 +114,12 @@ BEGIN
         BLOCK "040904e4"
         BEGIN
             VALUE "CompanyName", "TODO: <Company name>"
-            VALUE "FileDescription", "TODO: <File description>"
+            VALUE "FileDescription", "FinsembleAssimilation"
             VALUE "FileVersion", "1.0.0.1"
             VALUE "InternalName", "CppWindowsHook.exe"
             VALUE "LegalCopyright", "TODO: (c) <Company name>.  All rights reserved."
             VALUE "OriginalFilename", "CppWindowsHook.exe"
-            VALUE "ProductName", "TODO: <Product name>"
+            VALUE "ProductName", "FinsembleAssimilation: <Product name>"
             VALUE "ProductVersion", "1.0.0.1"
         END
     END

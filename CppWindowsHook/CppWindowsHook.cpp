@@ -85,7 +85,8 @@ int main() {
 }
 CCppWindowsHookApp::CCppWindowsHookApp()
 {
-	// TODO: add construction code here,
+	
+	// 111TODO: add construction code here,
 	// Place all significant initialization in InitInstance
 }
 
@@ -118,6 +119,7 @@ BOOL CCppWindowsHookApp::InitInstance()
 		CCppWindowsHookDlg dlg;
 	
 		m_pMainWnd = &dlg;
+		//dlg.SetWindowTextW(L"FinSim");
 		INT_PTR nResponse = dlg.DoModal();
 
 		//uninstall hook]

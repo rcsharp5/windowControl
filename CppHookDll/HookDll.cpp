@@ -223,8 +223,8 @@ std::string buildFullExport(LPARAM lParam,std::string uuid) {
 	writer.String(std::to_string(mhs->pt.x).c_str());
 	writer.Key("y");
 	writer.String(std::to_string(mhs->pt.y).c_str());
-	writer.Key("windowName");
-	writer.String(NewName);
+	//writer.Key("windowName");
+	//writer.String(NewName);
 	writer.Key("usedHandle");
 	writer.String(handleStirng.c_str());
 	writer.Key("parentHandle");
@@ -283,8 +283,58 @@ std::string buildEndMoveExport(LPARAM lParam, std::string uuid) {
 }
 
 bool lastMove = false;
+
+BOOL CALLBACK updateGlobalWindow(HWND hWnd, LPARAM lParam) {
+
+	
+
+
+	char wnd_title[256];
+	GetWindowTextA(hWnd, wnd_title, 256);
+	std::string data = wnd_title;
+	std::size_t found = data.find("FinSim");
+	if (found != std::string::npos) {
+		//g_MhWnd = hWnd;
+		g_MhWnd = GetAncestor(hWnd, GA_PARENT);
+		return false;
+	}
+	
+
+
+	return true;
+}
+
+
+
 LRESULT CALLBACK MouseProc(int nCode, WPARAM wParam, LPARAM lParam)
 {
+	//if (g_MhWnd == NULL) {
+	//	EnumWindows(updateGlobalWindow, NULL);
+	////	bool worked = PostMessage(g_MhWnd, WM_TEST, wParam, lParam);
+		
+	//};
+	//if (g_MhWnd == NULL) {
+	//	return true;
+	//}
+	//
+	LPMOUSEHOOKSTRUCT mhs = (LPMOUSEHOOKSTRUCT)lParam;
+	
+	//return ::CallNextHookEx(g_MhHook, nCode, wParam, lParam);
+	
+
+	TCHAR className[MAX_PATH];
+	GetClassName(mhs->hwnd, className, _countof(className));
+	std::wstring arr_w(className);
+	std::string cName(arr_w.begin(), arr_w.end());//classNames
+
+												  //std::string windowName; // The data the user has typed will be stored here
+
+	
+		
+		
+		//OutputDebugStringA(wtitle.c_str());
+
+
 	if (wParam == WM_NCLBUTTONUP || wParam == WM_LBUTTONUP) {
 		return ::CallNextHookEx(g_MhHook, nCode, wParam, lParam);
 	}
@@ -341,7 +391,7 @@ LRESULT CALLBACK MouseProc(int nCode, WPARAM wParam, LPARAM lParam)
 		return ::CallNextHookEx(g_MhHook, nCode, wParam, lParam);
 	}
 	
-	LPMOUSEHOOKSTRUCT mhs = (LPMOUSEHOOKSTRUCT)lParam;
+	//LPMOUSEHOOKSTRUCT mhs = (LPMOUSEHOOKSTRUCT)lParam;
 	char buf[99] = "";
 
 	sprintf(buf, "%p", mhs->hwnd);//Get the hwnd id
@@ -417,6 +467,21 @@ LRESULT CALLBACK MouseProc(int nCode, WPARAM wParam, LPARAM lParam)
 	{
 		bool abc = false;
 	}
+	int length = GetWindowTextLength(mhs->hwnd) + 1;
+
+	char wnd_title[256];
+	GetWindowTextA(mhs->hwnd, wnd_title, 256);
+	std::string  wtitle = wnd_title;
+	std::size_t found = wtitle.find("Skype");
+	if (found != std::string::npos) {
+
+		HANDLE testEvent = CreateEvent(NULL,        // no security
+			FALSE,       // manual-reset event
+			TRUE,      // not signaled
+			L"testEvent"); // event name
+		PulseEvent(testEvent);
+	}
+
 
 	::SendMessage(g_MhWnd, WM_MOVESTART, wParam, lParam);
 	

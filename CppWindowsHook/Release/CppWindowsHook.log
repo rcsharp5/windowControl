@@ -1,46 +1,7 @@
-﻿  CppWindowsHookDlg.cpp
-c:\users\ryan\desktop\projects\windowcontrol\simple-websocket-server\crypto.hpp(110): warning C4244: 'argument': conversion from 'std::streamsize' to '::size_t', possible loss of data
-c:\users\ryan\desktop\projects\windowcontrol\simple-websocket-server\crypto.hpp(139): warning C4244: 'argument': conversion from 'std::streamsize' to '::size_t', possible loss of data
-c:\users\ryan\desktop\projects\windowcontrol\simple-websocket-server\crypto.hpp(168): warning C4244: 'argument': conversion from 'std::streamsize' to '::size_t', possible loss of data
-c:\users\ryan\desktop\projects\windowcontrol\simple-websocket-server\crypto.hpp(197): warning C4244: 'argument': conversion from 'std::streamsize' to '::size_t', possible loss of data
-CL : warning : Boost.Coroutine is now deprecated. Please switch to Boost.Coroutine2. To disable this warning message, define BOOST_COROUTINES_NO_DEPRECATION_WARNING.
-CL : warning : Boost.Coroutine is now deprecated. Please switch to Boost.Coroutine2. To disable this warning message, define BOOST_COROUTINES_NO_DEPRECATION_WARNING.
-CL : warning : Boost.Coroutine is now deprecated. Please switch to Boost.Coroutine2. To disable this warning message, define BOOST_COROUTINES_NO_DEPRECATION_WARNING.
-CppWindowsHookDlg.cpp(157): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-  C:\Program Files (x86)\Windows Kits\10\Include\10.0.15063.0\ucrt\stdio.h(1772): note: see declaration of 'sprintf'
-CppWindowsHookDlg.cpp(164): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-  C:\Program Files (x86)\Windows Kits\10\Include\10.0.15063.0\ucrt\stdio.h(1772): note: see declaration of 'sprintf'
-CppWindowsHookDlg.cpp(214): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-  C:\Program Files (x86)\Windows Kits\10\Include\10.0.15063.0\ucrt\stdio.h(1772): note: see declaration of 'sprintf'
-CppWindowsHookDlg.cpp(270): warning C4129: 'M': unrecognized character escape sequence
-CppWindowsHookDlg.cpp(406): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-  C:\Program Files (x86)\Windows Kits\10\Include\10.0.15063.0\ucrt\stdio.h(1772): note: see declaration of 'sprintf'
-CppWindowsHookDlg.cpp(434): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-  C:\Program Files (x86)\Windows Kits\10\Include\10.0.15063.0\ucrt\stdio.h(1772): note: see declaration of 'sprintf'
-CppWindowsHookDlg.cpp(474): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-  C:\Program Files (x86)\Windows Kits\10\Include\10.0.15063.0\ucrt\stdio.h(1772): note: see declaration of 'sprintf'
-CppWindowsHookDlg.cpp(546): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-  C:\Program Files (x86)\Windows Kits\10\Include\10.0.15063.0\ucrt\stdio.h(1772): note: see declaration of 'sprintf'
-CppWindowsHookDlg.cpp(528): warning C4101: 'ex': unreferenced local variable
-CppWindowsHookDlg.cpp(794): warning C4129: 'M': unrecognized character escape sequence
-CppWindowsHookDlg.cpp(1132): warning C4129: 'M': unrecognized character escape sequence
-CppWindowsHookDlg.cpp(1148): warning C4101: 'ex': unreferenced local variable
-CppWindowsHookDlg.cpp(1219): warning C4996: 'SimpleWeb::SocketServerBase<SimpleWeb::WS>::Endpoint::onopen': was declared deprecated
-  C:\Users\ryan\Desktop\projects\windowControl\Simple-WebSocket-Server\server_ws.hpp(193): note: see declaration of 'SimpleWeb::SocketServerBase<SimpleWeb::WS>::Endpoint::onopen'
-  CppWindowsHookDlg.cpp(1219): note: This diagnostic occurred in the compiler generated function 'SimpleWeb::SocketServerBase<SimpleWeb::WS>::Endpoint::~Endpoint(void)'
-CppWindowsHookDlg.cpp(1219): warning C4996: 'SimpleWeb::SocketServerBase<SimpleWeb::WS>::Endpoint::onmessage': was declared deprecated
-  C:\Users\ryan\Desktop\projects\windowControl\Simple-WebSocket-Server\server_ws.hpp(195): note: see declaration of 'SimpleWeb::SocketServerBase<SimpleWeb::WS>::Endpoint::onmessage'
-  CppWindowsHookDlg.cpp(1219): note: This diagnostic occurred in the compiler generated function 'SimpleWeb::SocketServerBase<SimpleWeb::WS>::Endpoint::~Endpoint(void)'
-CppWindowsHookDlg.cpp(1219): warning C4996: 'SimpleWeb::SocketServerBase<SimpleWeb::WS>::Endpoint::onclose': was declared deprecated
-  C:\Users\ryan\Desktop\projects\windowControl\Simple-WebSocket-Server\server_ws.hpp(197): note: see declaration of 'SimpleWeb::SocketServerBase<SimpleWeb::WS>::Endpoint::onclose'
-  CppWindowsHookDlg.cpp(1219): note: This diagnostic occurred in the compiler generated function 'SimpleWeb::SocketServerBase<SimpleWeb::WS>::Endpoint::~Endpoint(void)'
-CppWindowsHookDlg.cpp(1219): warning C4996: 'SimpleWeb::SocketServerBase<SimpleWeb::WS>::Endpoint::onerror': was declared deprecated
-  C:\Users\ryan\Desktop\projects\windowControl\Simple-WebSocket-Server\server_ws.hpp(199): note: see declaration of 'SimpleWeb::SocketServerBase<SimpleWeb::WS>::Endpoint::onerror'
-  CppWindowsHookDlg.cpp(1219): note: This diagnostic occurred in the compiler generated function 'SimpleWeb::SocketServerBase<SimpleWeb::WS>::Endpoint::~Endpoint(void)'
-  Generating code
-  119 of 7267 functions ( 1.6%) were compiled, the rest were copied from previous compilation.
-    118 functions were new in current compilation
-    1 functions had inline decision re-evaluated but remain unchanged
+﻿  Generating code
+  0 of 7463 functions ( 0.0%) were compiled, the rest were copied from previous compilation.
+    0 functions were new in current compilation
+    0 functions had inline decision re-evaluated but remain unchanged
   Finished generating code
-  CppWindowsHook.vcxproj -> C:\Users\ryan\Desktop\projects\windowControl\Release\CppWindowsHook.exe
-  CppWindowsHook.vcxproj -> C:\Users\ryan\Desktop\projects\windowControl\Release\CppWindowsHook.pdb (Full PDB)
+  CppWindowsHook.vcxproj -> E:\c++\C++\Release\CppWindowsHook.exe
+  CppWindowsHook.vcxproj -> E:\c++\C++\Release\CppWindowsHook.pdb (Full PDB)
