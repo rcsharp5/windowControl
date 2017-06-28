@@ -282,16 +282,29 @@ PSECURITY_DESCRIPTOR MakeAllowAllSecurityDescriptor(void) // Read that you can g
 }
 
 HANDLE mMutex;
-HANDLE testEvent;
+HANDLE startEvent;
+HANDLE endEvent;
 HANDLE waitHandle;
 
 map<std::string, boost::function<void()> > funcs;
-void testEventwait() {
+void eventParser(PVOID lpParam, BOOLEAN TimerOrWaitFired) {
 	OutputDebugString(L"event fired");
+	//if (lpParam == NULL) return;
+		
+	//std::string eventType = (std::string*) lpParam;
+	
 	funcs["start"]();
 	//CCppWindowsHookDlg::OnMoveStart();
 };
+void eventParserEnd(PVOID lpParam, BOOLEAN TimerOrWaitFired) {
+	OutputDebugString(L"event end fired");
+	//if (lpParam == NULL) return;
 
+	//std::string eventType = (std::string*) lpParam;
+
+	funcs["end"]();
+	//CCppWindowsHookDlg::OnMoveStart();
+};
 
 void CCppWindowsHookDlg::OnWindowPosChanging(WINDOWPOS FAR* lpwndpos) {
 
@@ -627,6 +640,7 @@ void OnMoveStart()
 
 	_moving = true;
 	shouldParseEvents = true;
+	SetMovingStatus(true);
 	parseMoveEvents();
 
 	CString strItem(L"Move started:" +str+ L"\r\n");
@@ -651,7 +665,7 @@ long CCppWindowsHookDlg::OnMoveEnd(WPARAM wParam, LPARAM lParam)
 	}
 
 	
-	if (!doc.HasMember("topic")) return 0;
+	if (!doc.HasMember("topic")) return 0 ;
 	rapidjson::Value& s = doc["topic"];
 	s.SetString("moveEnd");
 	POINT p;
@@ -673,10 +687,11 @@ long CCppWindowsHookDlg::OnMoveEnd(WPARAM wParam, LPARAM lParam)
 	_moving = false;
 	CString strItem(L"Move Ended:"  +str+ L"\r\n");
 	CString strEdit;
-	GetDlgItem(IDC_MSG)->GetWindowText(strEdit);
-	GetDlgItem(IDC_MSG)->SetWindowText(strItem + strEdit);
-
-	return 0;
+	//GetDlgItem(IDC_MSG)->GetWindowText(strEdit);
+	//GetDlgItem(IDC_MSG)->SetWindowText(strItem + strEdit);
+	SetMovingStatus(false);
+	PulseEvent(endEvent);
+	return 0 ;
 }
 rapidjson::Document get_nested(rapidjson::Document &d, std::string key) {
 	rapidjson::StringBuffer buffer;
@@ -1065,13 +1080,19 @@ BOOL CCppWindowsHookDlg::OnInitDialog()
 {
 	CDialog::OnInitDialog();
 	SetWindowTextW(L"FinSim");
-	testEvent = CreateEvent(NULL,        // no security
+	startEvent = CreateEvent(NULL,        // no security
 		FALSE,       // manual-reset event
 		FALSE,      // not signaled
-		L"testEvent"); // event name
+		L"StartMoveEvent"); // event name
+	 endEvent = CreateEvent(NULL,        // no security
+		FALSE,       // manual-reset event
+		FALSE,      // not signaled
+		L"EndMoveEvent"); // event name
 	funcs["start"] = &OnMoveStart;
-	RegisterWaitForSingleObject(&waitHandle, testEvent, (WAITORTIMERCALLBACK)testEventwait, NULL, INFINITE, WT_EXECUTEDEFAULT);
-
+	//funcs["end"] = &OnMoveEnd;
+	RegisterWaitForSingleObject(&waitHandle, startEvent, (WAITORTIMERCALLBACK)eventParser, "start", INFINITE, WT_EXECUTEDEFAULT);
+	//RegisterWaitForSingleObject(&waitHandle, endEvent, (WAITORTIMERCALLBACK)eventParserEnd, "end", INFINITE, WT_EXECUTEDEFAULT);
+	
 
 	//ChangeWindowMessageFilter(m_hWnd, WM_TEST)
 	ChangeWindowMessageFilter(WM_TEST, 1);

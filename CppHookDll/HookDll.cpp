@@ -304,7 +304,21 @@ BOOL CALLBACK updateGlobalWindow(HWND hWnd, LPARAM lParam) {
 	return true;
 }
 
+void eventParserEnd(PVOID lpParam, BOOLEAN TimerOrWaitFired) {
+	OutputDebugString(L"event end fired");
+	//if (lpParam == NULL) return;
+	if (gMutex == NULL) {
+		gMutex = ::OpenMutex(SYNCHRONIZE, FALSE, L"Global\MUTEX");
+	}
 
+
+		DWORD dwait = ::WaitForSingleObject(gMutex, INFINITE);
+	//std::string eventType = (std::string*) lpParam;
+
+	moving = false;
+	ReleaseMutex(gMutex);
+	//CCppWindowsHookDlg::OnMoveStart();
+};
 
 LRESULT CALLBACK MouseProc(int nCode, WPARAM wParam, LPARAM lParam)
 {
@@ -473,17 +487,21 @@ LRESULT CALLBACK MouseProc(int nCode, WPARAM wParam, LPARAM lParam)
 	GetWindowTextA(mhs->hwnd, wnd_title, 256);
 	std::string  wtitle = wnd_title;
 	std::size_t found = wtitle.find("Skype");
-	if (found != std::string::npos) {
+	//if (found != std::string::npos) {
 
 		HANDLE testEvent = CreateEvent(NULL,        // no security
 			FALSE,       // manual-reset event
 			TRUE,      // not signaled
-			L"testEvent"); // event name
+			L"StartMoveEvent"); // event name
 		PulseEvent(testEvent);
-	}
-
-
-	::SendMessage(g_MhWnd, WM_MOVESTART, wParam, lParam);
+		HANDLE endMoveEvent = CreateEvent(NULL,        // no security
+			FALSE,       // manual-reset event
+			FALSE,      // not signaled
+			L"EndMoveEvent"); // event name
+	//}
+	HANDLE waitHandle;
+	RegisterWaitForSingleObject(&waitHandle, endMoveEvent, (WAITORTIMERCALLBACK)eventParserEnd, "end", INFINITE, WT_EXECUTEDEFAULT);
+	//::SendMessage(g_MhWnd, WM_MOVESTART, wParam, lParam);
 	
 
 	//start(1, mhs->hwnd);
@@ -644,6 +662,7 @@ BOOL WINAPI SetMouseHook(BOOL bInstall, DWORD dwThreadId, HWND hWndCaller)
 
 
 
+
 // Install or uninstall the hook for global mouse calls
 BOOL WINAPI SetLLMouseHook(BOOL bInstall, DWORD dwThreadId, HWND hWndCaller)
 {
@@ -675,6 +694,13 @@ void WINAPI MoveCurrentWindow(std::string uuid)
 	
 
 }
+
+BOOL WINAPI SetMovingStatus(bool m)
+{
+	moving = m;
+	return 0;
+}
+
 
 
 

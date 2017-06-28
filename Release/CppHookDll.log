@@ -3,20 +3,21 @@ HookDll.cpp(165): warning C4996: 'sprintf': This function or variable may be uns
   C:\Program Files (x86)\Windows Kits\10\Include\10.0.15063.0\ucrt\stdio.h(1772): note: see declaration of 'sprintf'
 HookDll.cpp(173): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
   C:\Program Files (x86)\Windows Kits\10\Include\10.0.15063.0\ucrt\stdio.h(1772): note: see declaration of 'sprintf'
-HookDll.cpp(359): warning C4129: 'M': unrecognized character escape sequence
-HookDll.cpp(397): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+HookDll.cpp(311): warning C4129: 'M': unrecognized character escape sequence
+HookDll.cpp(373): warning C4129: 'M': unrecognized character escape sequence
+HookDll.cpp(411): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
   C:\Program Files (x86)\Windows Kits\10\Include\10.0.15063.0\ucrt\stdio.h(1772): note: see declaration of 'sprintf'
-HookDll.cpp(412): warning C4996: 'wcstombs': This function or variable may be unsafe. Consider using wcstombs_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+HookDll.cpp(426): warning C4996: 'wcstombs': This function or variable may be unsafe. Consider using wcstombs_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
   C:\Program Files (x86)\Windows Kits\10\Include\10.0.15063.0\ucrt\stdlib.h(1019): note: see declaration of 'wcstombs'
-HookDll.cpp(381): warning C4101: 'ex': unreferenced local variable
-HookDll.cpp(466): warning C4101: 'ex': unreferenced local variable
-HookDll.cpp(523): warning C4129: 'M': unrecognized character escape sequence
-HookDll.cpp(540): warning C4101: 'ex': unreferenced local variable
+HookDll.cpp(395): warning C4101: 'ex': unreferenced local variable
+HookDll.cpp(480): warning C4101: 'ex': unreferenced local variable
+HookDll.cpp(541): warning C4129: 'M': unrecognized character escape sequence
+HookDll.cpp(558): warning C4101: 'ex': unreferenced local variable
      Creating library E:\c++\C++\Release\CppHookDll.lib and object E:\c++\C++\Release\CppHookDll.exp
   Generating code
-  2 of 2291 functions ( 0.1%) were compiled, the rest were copied from previous compilation.
+  2 of 2293 functions ( 0.1%) were compiled, the rest were copied from previous compilation.
     0 functions were new in current compilation
-    3 functions had inline decision re-evaluated but remain unchanged
+    11 functions had inline decision re-evaluated but remain unchanged
   Finished generating code
   CppHookDll.vcxproj -> E:\c++\C++\Release\CppHookDll.dll
   CppHookDll.vcxproj -> E:\c++\C++\Release\CppHookDll.pdb (Full PDB)

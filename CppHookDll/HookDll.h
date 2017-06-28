@@ -47,3 +47,5 @@ BOOL HOOKDLL_API WINAPI SetLLMouseHook(BOOL bInstall,
 	HWND hWndCaller = NULL);
 
 void HOOKDLL_API WINAPI MoveCurrentWindow(std::string uuid);
+
+BOOL HOOKDLL_API WINAPI SetMovingStatus(bool m);
